@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SPARK (Speech Pattern Analysis for Recognizing Parkinson's) - Login/Register</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Hind:wght@300&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Hind', sans-serif;
+      background: linear-gradient(-45deg, #ede7f6, #d1c4e9, #b39ddb, #9575cd);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Navbar */
+    nav {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    nav .logo {
+      font-family: 'Pacifico', cursive;
+      font-size: 1.8rem;
+      color: #4a148c;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 25px;
+    }
+
+    nav ul li a {
+      text-decoration: none;
+      color: #4a148c;
+      font-weight: bold;
+      position: relative;
+      transition: 0.3s;
+    }
+
+    nav ul li a::after {
+      content: '';
+      position: absolute;
+      width: 0%;
+      height: 2px;
+      background: #4a148c;
+      bottom: -3px;
+      left: 0;
+      transition: 0.3s ease-in-out;
+    }
+
+    nav ul li a:hover::after {
+      width: 100%;
+    }
+
+    /* Container */
+    .container {
+      max-width: 450px;
+      margin: 4rem auto;
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(16px);
+      border-radius: 25px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .container h1 {
+      text-align: center;
+      color: #4a148c;
+      font-size: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    form {
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 20px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s;
+    }
+
+    form:hover {
+      transform: translateY(-3px);
+    }
+
+    form h2 {
+      text-align: center;
+      color: #6a1b9a;
+      margin-bottom: 1rem;
+    }
+
+    form input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.85);
+      font-size: 1rem;
+    }
+
+    form button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 1rem;
+      background-color: #7b1fa2;
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+
+    form button:hover {
+      background-color: #9c27b0;
+      transform: scale(1.02);
+    }
+
+    /* Footer */
+    footer {
+      background: rgba(255, 255, 255, 0.15);
+      color: #4a148c;
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.95rem;
+      font-weight: bold;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 -8px 20px rgba(0,0,0,0.1);
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+
+    @media screen and (max-width: 500px) {
+      .container {
+        margin: 2rem 1rem;
+      }
+
+      nav {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      nav ul {
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 0.5rem;
+      }
+
+      nav ul li a {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Navbar -->
+  <nav>
+    <div class="logo">Speech Pattern Analysis for Recognizing Parkinson's</div>
+
+  </nav>
+
+  <!-- Main Login/Register Area -->
+  <div class="container">
+    <h1>Login & Register</h1>
+
+    <!-- Login Form -->
+    <form action="{{ url_for('logedin') }}" method="post">
+      <h2>Login</h2>
+      <input type="text" name="user_id" placeholder="User ID" required />
+      <input type="password" name="password" placeholder="Password" required />
+      <button type="submit">🔐 Login</button>
+    </form>
+
+    <!-- Register Form -->
+    <form action="{{ url_for('register2') }}" method="post">
+      <h2>Register</h2>
+      <p style="text-align:center; font-size: 0.9rem; color: #333;">New user? Click below to create an account</p>
+      <button type="submit">📝 Register</button>
+    </form>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    &copy; 2025 — Speech Pattern Analysis for Recognizing Parkinson's
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Live Voice Recording | Parkinson Detection</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Poppins', 'sans-serif'] },
+          animation: {
+            'pulse-slow': 'pulse 3s ease-in-out infinite',
+            'float': 'float 4s ease-in-out infinite',
+            'glow': 'glow 2s ease-in-out infinite',
+          },
+          keyframes: {
+            float: {
+              '0%,100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-10px)' },
+            },
+            glow: {
+              '0%,100%': { boxShadow: '0 0 10px rgba(99,102,241,0.4)' },
+              '50%': { boxShadow: '0 0 25px rgba(168,85,247,0.8)' },
+            },
+          },
+        },
+      },
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+
+<body class="min-h-screen bg-gradient-to-br from-indigo-600 via-purple-700 to-pink-600 flex items-center justify-center p-6 overflow-hidden relative">
+
+  <!-- Animated Background Blobs -->
+  <div class="absolute inset-0">
+    <div class="absolute top-0 left-0 w-80 h-80 bg-purple-500 rounded-full filter blur-3xl opacity-40 animate-pulse-slow"></div>
+    <div class="absolute bottom-0 right-0 w-96 h-96 bg-pink-500 rounded-full filter blur-3xl opacity-40 animate-pulse-slow delay-1000"></div>
+  </div>
+
+  <!-- Main Card -->
+  <div class="relative z-10 bg-white bg-opacity-95 backdrop-blur-xl rounded-3xl shadow-2xl p-10 w-full max-w-lg border border-white border-opacity-30 text-center">
+
+    <!-- Header -->
+    <div class="mb-8 animate-float">
+      <div class="inline-flex p-4 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full text-white shadow-lg">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+        </svg>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-800 mt-3">Parkinson’s Detection System</h1>
+      <p class="text-gray-600 mt-2">Record your voice or acoustic pen sound for Parkinson’s analysis</p>
+    </div>
+
+    <!-- Recorder UI -->
+    <div id="recorderUI" class="space-y-8">
+
+      <!-- Visualizer -->
+      <div class="flex items-end justify-center h-24 space-x-1">
+        <div class="w-2 bg-indigo-400 rounded-full animate-bounce" style="animation-delay:0s"></div>
+        <div class="w-2 bg-purple-400 rounded-full animate-bounce" style="animation-delay:0.1s"></div>
+        <div class="w-2 bg-pink-400 rounded-full animate-bounce" style="animation-delay:0.2s"></div>
+        <div class="w-2 bg-indigo-500 rounded-full animate-bounce" style="animation-delay:0.3s"></div>
+        <div class="w-2 bg-purple-500 rounded-full animate-bounce" style="animation-delay:0.4s"></div>
+        <div class="w-2 bg-pink-500 rounded-full animate-bounce" style="animation-delay:0.5s"></div>
+        <div class="w-2 bg-indigo-600 rounded-full animate-bounce" style="animation-delay:0.6s"></div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="flex justify-center gap-4">
+        <button id="recordBtn"
+                class="px-8 py-4 bg-gradient-to-r from-red-500 to-pink-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center gap-2 animate-glow">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="6"/></svg>
+          Start Recording
+        </button>
+
+        <button id="stopBtn" disabled
+                class="px-8 py-4 bg-gray-400 text-white font-semibold rounded-xl shadow-lg opacity-50 cursor-not-allowed flex items-center gap-2">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10h6v4H9z"/>
+          </svg>
+          Stop
+        </button>
+      </div>
+
+      <!-- Status -->
+      <p id="status" class="text-sm text-gray-500">Ready to record your sample</p>
+    </div>
+
+    <!-- Playback + Upload -->
+    <div id="playbackUI" class="hidden space-y-6 mt-8">
+      <audio id="audioPlayback" controls class="w-full rounded-lg shadow-md"></audio>
+
+      <form id="uploadForm" action="/predict" method="post" enctype="multipart/form-data">
+        <input type="file" id="audioFile" name="audio" class="hidden">
+        <button type="submit"
+                class="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-700 text-white font-semibold text-lg rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+          Predict Parkinson’s Status
+        </button>
+      </form>
+
+      <button onclick="resetRecorder()" class="text-sm text-indigo-600 hover:underline">Record Again</button>
+    </div>
+
+    <!-- Tips -->
+    <div class="mt-8 text-xs text-gray-500">
+      <p>🎤 Speak the provided phrase slowly and clearly</p>
+      <p>🧠 This helps analyze vocal patterns related to Parkinson’s disease</p>
+    </div>
+  </div>
+
+  <!-- JS Logic -->
+  <script>
+    const recordBtn = document.getElementById('recordBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const status = document.getElementById('status');
+    const recorderUI = document.getElementById('recorderUI');
+    const playbackUI = document.getElementById('playbackUI');
+    const audioPlayback = document.getElementById('audioPlayback');
+    const audioFileInput = document.getElementById('audioFile');
+
+    let mediaRecorder;
+    let chunks = [];
+
+    recordBtn.onclick = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        chunks = [];
+        mediaRecorder.start();
+
+        recordBtn.disabled = true;
+        stopBtn.disabled = false;
+        stopBtn.classList.replace('bg-gray-400', 'bg-gradient-to-r');
+        stopBtn.classList.replace('opacity-50', 'opacity-100');
+        stopBtn.classList.remove('cursor-not-allowed');
+        stopBtn.classList.add('from-red-600', 'to-pink-700');
+        status.textContent = '🎙️ Recording... Please speak now';
+        status.className = 'text-sm text-red-600 font-medium';
+
+        mediaRecorder.ondataavailable = e => chunks.push(e.data);
+
+        mediaRecorder.onstop = () => {
+          const blob = new Blob(chunks, { type: 'audio/mp3' });
+          const url = URL.createObjectURL(blob);
+          audioPlayback.src = url;
+
+          const file = new File([blob], 'voice_sample.mp3', { type: 'audio/mp3' });
+          const dt = new DataTransfer();
+          dt.items.add(file);
+          audioFileInput.files = dt.files;
+
+          recorderUI.classList.add('hidden');
+          playbackUI.classList.remove('hidden');
+          triggerConfetti();
+        };
+
+      } catch (err) {
+        alert('🎧 Microphone access denied or unavailable.');
+        console.error(err);
+      }
+    };
+
+    stopBtn.onclick = () => {
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+        recordBtn.disabled = false;
+        stopBtn.disabled = true;
+        status.textContent = 'Processing your voice sample...';
+        status.className = 'text-sm text-indigo-600 font-medium';
+      }
+    };
+
+    function resetRecorder() {
+      playbackUI.classList.add('hidden');
+      recorderUI.classList.remove('hidden');
+      recordBtn.disabled = false;
+      stopBtn.disabled = true;
+      stopBtn.className = 'px-8 py-4 bg-gray-400 text-white font-semibold rounded-xl shadow-lg opacity-50 cursor-not-allowed flex items-center gap-2';
+      status.textContent = 'Ready to record your sample';
+      status.className = 'text-sm text-gray-500';
+      audioPlayback.src = '';
+    }
+
+    function triggerConfetti() {
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    }
+  </script>
+</body>
+</html>

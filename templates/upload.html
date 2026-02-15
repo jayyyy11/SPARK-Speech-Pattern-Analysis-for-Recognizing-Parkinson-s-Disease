@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Upload Voice Sample | SPARK</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Poppins', 'sans-serif'] },
+          animation: { 'pulse-slow': 'pulse 3s ease-in-out infinite' }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 flex items-center justify-center p-6">
+
+  <!-- Background Decor -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute top-20 left-20 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse-slow"></div>
+    <div class="absolute bottom-20 right-20 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse-slow delay-700"></div>
+  </div>
+
+  <!-- Upload Card -->
+  <div class="relative z-10 bg-white bg-opacity-90 backdrop-blur-xl rounded-3xl shadow-2xl p-8 w-full max-w-md border border-white border-opacity-30">
+    
+    <div class="text-center mb-8">
+      <div class="inline-flex p-3 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full text-white mb-4">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19l-7-7 7-7m14 14l-7-7 7-7"/>
+        </svg>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-800">Upload Voice Sample</h1>
+      <p class="text-gray-600 mt-2">Record or upload a .wav file of patient speech</p>
+    </div>
+
+    <!-- Form -->
+    <form id="uploadForm" action="/predict" method="post" enctype="multipart/form-data" class="space-y-6">
+      
+      <!-- Drag & Drop Area -->
+      <div 
+        id="dropZone"
+        class="border-2 border-dashed border-indigo-300 rounded-xl p-10 text-center cursor-pointer transition-all duration-300 hover:border-indigo-500 hover:bg-indigo-50"
+        onclick="document.getElementById('audioInput').click()"
+      >
+        
+        <input type="file" name="audio" id="audioInput" accept=".mp3,audio/mp3,.wav,audio/wav" required class="hidden" />
+
+        <div id="dropText">
+          <svg class="w-16 h-16 mx-auto text-indigo-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/>
+          </svg>
+          <p class="text-lg font-medium text-gray-700">Drop .wav file here</p>
+          <p class="text-sm text-gray-500 mt-1">or click to browse</p>
+        </div>
+
+        <div id="filePreview" class="hidden mt-4 p-3 bg-indigo-50 rounded-lg border border-indigo-200">
+          <p class="text-sm font-medium text-indigo-700 truncate" id="fileName"></p>
+          <button type="button" onclick="resetUpload()" class="text-xs text-red-600 hover:underline mt-1">Remove</button>
+        </div>
+      </div>
+
+      <!-- Progress Bar (Visual) -->
+      <div id="progressContainer" class="hidden">
+        <div class="flex justify-between text-sm text-gray-600 mb-1">
+          <span>Analyzing voice sample...</span>
+          <span id="progressPercent">0%</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2">
+          <div id="progressBar" class="bg-gradient-to-r from-indigo-500 to-purple-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button 
+        type="submit"
+        id="submitBtn"
+        class="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-700 text-white font-semibold text-lg rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 opacity-0 pointer-events-none"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+        </svg>
+        Predict Parkinson’s Disease
+      </button>
+    </form>
+
+    <!-- Tips -->
+    <div class="mt-6 text-xs text-gray-500 text-center space-y-1">
+      <p>Tip: Record a short, clear voice sample for best detection accuracy.</p>
+      <p>Supported: <code class="bg-gray-100 px-1 rounded"></code><code class="bg-gray-100 px-1 rounded">.wav</code> files up to 30 seconds</p>
+    </div>
+  </div>
+
+  <!-- JavaScript for UX -->
+  <script>
+    const dropZone = document.getElementById('dropZone');
+    const audioInput = document.getElementById('audioInput');
+    const dropText = document.getElementById('dropText');
+    const filePreview = document.getElementById('filePreview');
+    const fileNameSpan = document.getElementById('fileName');
+    const submitBtn = document.getElementById('submitBtn');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+    const progressPercent = document.getElementById('progressPercent');
+
+    // Handle file selection
+    audioInput.addEventListener('change', function() {
+      if (this.files && this.files[0]) {
+        const file = this.files[0];
+        if (
+          !['audio/mpeg', 'audio/wav'].includes(file.type) &&
+          !file.name.match(/\.(mp3|wav)$/i)
+        ) {
+          alert('Please upload a valid .mp3 or .wav file');
+          return;
+        }
+        showFilePreview(file);
+      }
+    });
+
+    // Drag & Drop
+    ['dragenter', 'dragover'].forEach(event => {
+      dropZone.addEventListener(event, (e) => {
+        e.preventDefault();
+        dropZone.classList.add('border-indigo-500', 'bg-indigo-50');
+      });
+    });
+
+    ['dragleave', 'drop'].forEach(event => {
+      dropZone.addEventListener(event, (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('border-indigo-500', 'bg-indigo-50');
+      });
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      const files = e.dataTransfer.files;
+      if (files.length && ['audio/mpeg', 'audio/wav'].includes(files[0].type)) {
+        audioInput.files = files;
+        showFilePreview(files[0]);
+      } else {
+        alert('Please upload a valid .mp3 or .wav file');
+      }
+    });
+
+    function showFilePreview(file) {
+      dropText.classList.add('hidden');
+      filePreview.classList.remove('hidden');
+      fileNameSpan.textContent = file.name;
+      submitBtn.classList.remove('opacity-0', 'pointer-events-none');
+      submitBtn.classList.add('opacity-100');
+    }
+
+    function resetUpload() {
+      audioInput.value = '';
+      filePreview.classList.add('hidden');
+      dropText.classList.remove('hidden');
+      submitBtn.classList.add('opacity-0', 'pointer-events-none');
+      submitBtn.classList.remove('opacity-100');
+    }
+
+    // Fake upload progress (for demo)
+    document.getElementById('uploadForm').addEventListener('submit', function(e) {
+      if (!audioInput.files.length) return;
+
+      progressContainer.classList.remove('hidden');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = 'Processing...';
+
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 10;
+        progressBar.style.width = progress + '%';
+        progressPercent.textContent = progress + '%';
+        if (progress >= 100) {
+          clearInterval(interval);
+        }
+      }, 200);
+    });
+  </script>
+</body>
+</html>

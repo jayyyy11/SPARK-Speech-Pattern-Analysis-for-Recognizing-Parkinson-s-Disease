@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Result | Speech Pattern Analysis for Recognizing Parkinson's Disease</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="min-h-screen bg-gradient-to-br from-indigo-600 via-purple-700 to-pink-600 flex items-center justify-center p-6 overflow-hidden relative">
+
+  <div class="absolute inset-0">
+    <div class="absolute top-0 left-0 w-96 h-96 bg-purple-500 rounded-full filter blur-3xl opacity-40 animate-pulse"></div>
+    <div class="absolute bottom-0 right-0 w-96 h-96 bg-pink-500 rounded-full filter blur-3xl opacity-40 animate-pulse delay-1000"></div>
+  </div>
+
+  <div class="relative z-10 bg-white bg-opacity-95 backdrop-blur-xl rounded-3xl shadow-2xl p-10 max-w-4xl w-full border border-white border-opacity-30 text-center overflow-y-auto max-h-[90vh]">
+    
+    <h1 class="text-3xl font-bold text-gray-800 mb-2">Prediction Result</h1>
+    <p class="text-gray-600 mb-8">Your uploaded audio has been analyzed.</p>
+
+    <div class="relative inline-block mb-8">
+      <div class="relative bg-white rounded-3xl p-10 shadow-xl border-4 border-purple-200">
+        <h2 class="text-4xl font-bold text-indigo-700">{{ label }}</h2>
+        <p class="text-sm text-gray-500 mt-2">{{ disease }}</p>
+      </div>
+    </div>
+
+    <div class="text-left space-y-6">
+      <div>
+        <h3 class="text-lg font-semibold text-indigo-700">🩺 Symptoms</h3>
+        <ul class="list-disc list-inside text-gray-700">
+          {% for s in symptoms %}
+            <li>{{ s }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-semibold text-indigo-700">💊 Allopathy Treatments</h3>
+        <ul class="list-disc list-inside text-gray-700">
+          {% for t in treatment_allopathy %}
+            <li>{{ t }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-semibold text-indigo-700">🌿 Ayurvedic Treatments</h3>
+        <ul class="list-disc list-inside text-gray-700">
+          {% for a in ayurvedic %}
+            <li>{{ a }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-semibold text-indigo-700">🏠 Homeopathic Treatments</h3>
+        <ul class="list-disc list-inside text-gray-700">
+          {% for h in homeopathy %}
+            <li>{{ h }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-semibold text-indigo-700">💰 Estimated Treatment Cost</h3>
+        <p class="text-gray-700">India: <strong>{{ treatment_cost['India'] }}</strong></p>
+        <p class="text-gray-700">USA: <strong>{{ treatment_cost['USA'] }}</strong></p>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-semibold text-indigo-700">🏥 Top Hospitals in India</h3>
+        <ul class="list-disc list-inside text-gray-700">
+          {% for h in hospitals_india %}
+            <li>{{ h }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-semibold text-indigo-700">🏥 Top Hospitals in USA</h3>
+        <ul class="list-disc list-inside text-gray-700">
+          {% for h in hospitals_usa %}
+            <li>{{ h }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-semibold text-indigo-700">👩‍⚕️ Best Doctors in India</h3>
+        <ul class="list-disc list-inside text-gray-700">
+          {% for d in doctors_india %}
+            <li>{{ d }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-semibold text-indigo-700">👨‍⚕️ Best Doctors in USA</h3>
+        <ul class="list-disc list-inside text-gray-700">
+          {% for d in doctors_usa %}
+            <li>{{ d }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    <div class="mt-10 flex flex-wrap justify-center gap-4">
+      <a href="/" class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all">Back to Home</a>
+      <a href="/upload" class="px-6 py-3 bg-white text-indigo-700 font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-indigo-200">Try Another Audio</a>
+    </div>
+  </div>
+</body>
+</html>
